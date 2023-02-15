@@ -1,0 +1,34 @@
+---
+title: "My Portifolio"
+author: "Benjamin Bosman van Altena"
+date: "2023-02-15"
+output: html_document
+---
+This is normal text
+
+## This is a big heading
+
+### This is a smaller heading
+
+I put italics between stars *like this*
+
+I put bold berween two stars **Like this**
+
+I make a list like tgus:
+
+  - List 1
+  - List 2
+```{r}
+library(tidyverse)
+library(spotifyr)
+```
+
+
+```{r}
+my_portfolio <- get_playlist_audio_features("", "0qj2w8dGFZK5IAS8WvIhd5")
+```
+
+
+
+
+
