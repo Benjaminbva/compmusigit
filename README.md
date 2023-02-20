@@ -8,3 +8,4 @@ It would also be interesting to see what other information can be gathered from 
 Homework 7:
 Plot for home work 7 in this file on github: plot hoemwork 7.png
 
+In this plot 2 playlists are combined. The first playlist, containing 42 songs, has been categorized as sad by the album creator. The second playlist, containing 30 songs, has been categorized as happy by the album creator. "Happy" songs are red in this plot and "Sad" songs are blue. The 3 variables that are combined here are energy, valence and daneability. It is interesting to see that the spotify algorithm seems to have found the same results as the album creators. The sad songs score relatively low in all variables and the happy songs have a relatively high score. In the plot one can see a clear difference between the two album categories. 
