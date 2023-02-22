@@ -2,7 +2,9 @@
 title: "My Portifolio"
 author: "Benjamin Bosman van Altena"
 date: "2023-02-15"
-output: html_document
+output: 
+  flexdashboard::flex_dashboard:
+    storyboard: true
 ---
 This is normal text
 
@@ -20,26 +22,29 @@ I make a list like tgus:
   - List 2
 ```{r}
 library(tidyverse)
+library(plotly)
 library(spotifyr)
+#library(compmus)
 ```
 
+### welcome to Comp mus 2023
 
+welcome to comp mus 2023
 ```{r}
 my_portfolio <- get_playlist_audio_features("", "37i9dQZF1DX8C9xQcOrE6T")
 disney_happy <- get_playlist_audio_features("", "3mVhctLHVPghsMgsHkatCH")
 disney_sad<- get_playlist_audio_features("", "2kyovkBYjNPl9fMxWnCZ1S")
-```
 
-```{r}
 sad_happy <-
   bind_rows(
     disney_sad |> mutate(category = "Sad"),
     disney_happy |> mutate(category = "Happy")
   )
-```
 
-```{r}
 sad_happy |> ggplot(aes(x = valence, y = energy, colour = category, size = danceability)) + geom_point() +ggtitle("Disney Songs Sad vs Happy")
 
+#ggplotly(sad_happy)
 ```
+
+***
 In this plot 2 playlists are combined. The first playlist, containing 42 songs, has been categorized as sad by the album creator. The second playlist, containing 30 songs, has been categorized as happy by the album creator. "Happy" songs are red in this plot and "Sad" songs are blue. The 3 variables that are combined here are energy, valence and daneability. It is interesting to see that the spotify algorithm seems to have found the same results as the album creators. The sad songs score relatively low in all variables and the happy songs have a relatively high score. In the plot one can see a clear difference between the two album categories. 
