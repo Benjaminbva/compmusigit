@@ -24,7 +24,7 @@ I make a list like tgus:
 library(tidyverse)
 library(plotly)
 library(spotifyr)
-#library(compmus)
+library(compmus)
 ```
 
 ### welcome to Comp mus 2023
@@ -47,4 +47,67 @@ sad_happy |> ggplot(aes(x = valence, y = energy, colour = category, size = dance
 ```
 
 ***
-In this plot 2 playlists are combined. The first playlist, containing 42 songs, has been categorized as sad by the album creator. The second playlist, containing 30 songs, has been categorized as happy by the album creator. "Happy" songs are red in this plot and "Sad" songs are blue. The 3 variables that are combined here are energy, valence and daneability. It is interesting to see that the spotify algorithm seems to have found the same results as the album creators. The sad songs score relatively low in all variables and the happy songs have a relatively high score. In the plot one can see a clear difference between the two album categories. 
+In this plot 2 playlists are combined. The first playlist, containing 42 songs, has been categorized as sad by the album creator. The second playlist, containing 30 songs, has been categorized as happy by the album creator. "Happy" songs are red in this plot and "Sad" songs are blue. The 3 variables that are combined here are energy, valence and danceability. It is interesting to see that the spotify algorithm seems to have found the same results as the album creators. The sad songs score relatively low in all variables and the happy songs have a relatively high score. In the plot one can see a clear difference between the two album categories. 
+
+### Week 4 happy outlier Chromogram
+
+```{r}
+happy_outlier <-
+  get_tidy_audio_analysis("6mb6lVLNrcUgLnEN8QnDJd") |>
+  select(segments) |>
+  unnest(segments) |>
+  select(start, duration, pitches)
+
+happy_outlier |>
+  mutate(pitches = map(pitches, compmus_normalise, "euclidean")) |>
+  compmus_gather_chroma() |> 
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = pitch_class,
+      fill = value
+    )
+  ) +
+  geom_tile() + ggtitle("How far I'll go") + 
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  theme_minimal() +
+  scale_fill_viridis_c()
+
+
+```
+
+***
+By checking the disney_happy list I could see that the outlier in the valence was for the song: You'll be in my Heart.These songs have been categorized differently than one would expect looking only at the algorithm. It has a low valence and energy. One would expect the song to be in a sad playlist. When looking more into this I realised that that the song was in both playlists. Different people interpreted the song opposite ways. The might be because the songs text and context have been taken into consideration when choosing it for their playlist. The song could be heard differently when looking at the lyrics and context.  
+
+By looking at the chromagram one can see that the song is pretty slow for a "happy song". Also it has a lot of high notes, which could indicate sadness. When listening to song itself I came to the conlcusion that it felt like a sad song, but it could be categorized as happy if the lyrics and movie setting were taken into consideration. 
+
+### Week 4 sad outlier Chromogram
+```{r}
+sad_outlier <-
+  get_tidy_audio_analysis("6LBfozDVA7crIeuaPAVVlE") |>
+  select(segments) |>
+  unnest(segments) |>
+  select(start, duration, pitches)
+
+sad_outlier |>
+  mutate(pitches = map(pitches, compmus_normalise, "euclidean")) |>
+  compmus_gather_chroma() |> 
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = pitch_class,
+      fill = value
+    )
+  ) +
+  geom_tile() + ggtitle("You'll be in my Heart") + 
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  theme_minimal() +
+  scale_fill_viridis_c()
+
+
+```
+
+***
+By looking at the sad playlist I found that the song "You'll be in my heart" is also a big outlier. With a high valence and energy it wouldn't be seen as a sad song at first. In the chromogram one can see that the song it very upbeat for a "sad song". It also has quite an average pitch level. Were higher pitches would be expected for sad songs. When listening to the lyrics and doing further research I came to the conclusion that the song is seen by a lot of people as a love song. There seems no sad connection. It might be that the album creator listened to this song in a different context and had a different interpretation. I would say that the algorithm is "correct" and the song should not seen as a sad song. 
