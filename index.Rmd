@@ -6,20 +6,6 @@ output:
   flexdashboard::flex_dashboard:
     storyboard: true
 ---
-This is normal text
-
-## This is a big heading
-
-### This is a smaller heading
-
-I put italics between stars *like this*
-
-I put bold berween two stars **Like this**
-
-I make a list like tgus:
-
-  - List 1
-  - List 2
 ```{r}
 library(tidyverse)
 library(plotly)
@@ -27,7 +13,7 @@ library(spotifyr)
 library(compmus)
 ```
 
-### welcome to Comp mus 2023
+### Introduction
 
 welcome to comp mus 2023
 ```{r}
@@ -48,6 +34,137 @@ sad_happy |> ggplot(aes(x = valence, y = energy, colour = category, size = dance
 
 ***
 In this plot 2 playlists are combined. The first playlist, containing 42 songs, has been categorized as sad by the album creator. The second playlist, containing 30 songs, has been categorized as happy by the album creator. "Happy" songs are red in this plot and "Sad" songs are blue. The 3 variables that are combined here are energy, valence and danceability. It is interesting to see that the spotify algorithm seems to have found the same results as the album creators. The sad songs score relatively low in all variables and the happy songs have a relatively high score. In the plot one can see a clear difference between the two album categories. 
+
+### week 5 cepstogram happy outlier
+
+```{r}
+happy_cepstogram <-
+  get_tidy_audio_analysis("6mb6lVLNrcUgLnEN8QnDJd") |> 
+  compmus_align(bars, segments) |>                     # Change `bars`
+  select(bars) |>                                      #   in all three
+  unnest(bars) |>                                      #   of these lines.
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "rms", norm = "euclidean"              # Change summary & norm.
+      )
+  ) |>
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "rms", norm = "euclidean"              # Change summary & norm.
+      )
+  )
+
+happy_cepstogram |>
+  compmus_gather_timbre() |>
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = basis,
+      fill = value
+    )
+  ) +
+  geom_tile() + ggtitle("How far I'll go") + 
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  scale_fill_viridis_c() +                              
+  theme_classic()
+```
+***
+Like last week I looked at my happy and sad outliers. This is the cepstogram for "how far I'll go. The lower and middle coefficients capture more information about the track than the higher ones. 
+
+### week 5 cepstogram sad outlier
+
+```{r}
+sad_cepstogram <-
+  get_tidy_audio_analysis("6LBfozDVA7crIeuaPAVVlE") |> 
+  compmus_align(bars, segments) |>                     # Change `bars`
+  select(bars) |>                                      #   in all three
+  unnest(bars) |>                                      #   of these lines.
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "rms", norm = "euclidean"              # Change summary & norm.
+      )
+  ) |>
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "rms", norm = "euclidean"              # Change summary & norm.
+      )
+  )
+
+sad_cepstogram |>
+  compmus_gather_timbre() |>
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = basis,
+      fill = value
+    )
+  ) +
+  geom_tile() + ggtitle("You'll be in my Heart") + 
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  scale_fill_viridis_c() +                              
+  theme_classic()
+```
+
+***
+Like last week I looked at my happy and sad outliers. This is the cepstogram for "You'll be in my heart". The lower coefficients capture more information about the track than the higher ones.
+
+### week 5 self-similarity matrix sad outlier
+
+```{r}
+happy_cepstogram |>
+  compmus_self_similarity(timbre, "cosine") |> 
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() + ggtitle("How far I'll go") +
+  coord_fixed() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_classic() +
+  labs(x = "", y = "")
+```
+
+***
+How far I'll go is very similar. The timbre throughout the song changes very little.
+
+### week 5 self-similarity matrix sad outlier
+
+```{r}
+sad_cepstogram |>
+  compmus_self_similarity(timbre, "cosine") |> 
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() + ggtitle("You'll be in my Heart") +
+  coord_fixed() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_classic() +
+  labs(x = "", y = "")
+```
+
+***
+"you'll be in my heart" is less similar than "how far I'll go", but still has very little variation in timbre. 
 
 ### Week 4 happy outlier Chromogram
 
